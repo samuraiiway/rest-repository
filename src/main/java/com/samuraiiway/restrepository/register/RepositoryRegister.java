@@ -9,11 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.core.GenericTypeResolver;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -54,8 +53,10 @@ public class RepositoryRegister {
         HttpEntity request = new HttpEntity(body, headers);
 
         try {
-            ResponseEntity<String> responseEntity = restRepositoryAdvisor.getRestTemplate().exchange(url, method, request, String.class);
-            return resolveResponse(invocation, responseEntity.getBody());
+            ResponseEntity responseEntity = restRepositoryAdvisor
+                    .getRestTemplate()
+                    .exchange(url, method, request, resolveTypeReference(invocation));
+            return responseEntity.getBody();
 
         } catch (HttpStatusCodeException ex) {
             restRepositoryAdvisor.handleHttpException(ex);
@@ -68,18 +69,8 @@ public class RepositoryRegister {
         return null;
     }
 
-    private static Object resolveResponse(MethodInvocation invocation, String response) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-
-        Type returnType = resolveReturnType(invocation);
-
-        JavaType javaType = mapper.constructType(GenericTypeResolver.resolveType(returnType, (Class)null));
-
-        return mapper.readValue(response, javaType);
-    }
-
-    private static Type resolveReturnType(MethodInvocation invocation) {
-        return invocation.getMethod().getGenericReturnType();
+    private static ParameterizedTypeReference resolveTypeReference(MethodInvocation invocation) {
+        return ParameterizedTypeReference.forType(invocation.getMethod().getGenericReturnType());
     }
 
     private static Object resolveBody(MethodInvocation invocation) {
@@ -88,12 +79,12 @@ public class RepositoryRegister {
         for (Parameter parameter : invocation.getMethod().getParameters()) {
             Annotation annotation = parameter.getAnnotation(RequestBody.class);
             if (annotation != null) {
-                break;
+                return invocation.getArguments()[idx];
             }
             idx++;
         }
 
-        return invocation.getArguments()[idx];
+        return null;
     }
 
     private static HttpMethod resolveMethod(MethodInvocation invocation) {
