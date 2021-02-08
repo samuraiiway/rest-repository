@@ -1,7 +1,5 @@
 package com.samuraiiway.restrepository.register;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samuraiiway.restrepository.advisor.RestRepositoryAdvisor;
 import com.samuraiiway.restrepository.annotation.HttpRequest;
 import com.samuraiiway.restrepository.annotation.RequestBody;
@@ -15,7 +13,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
