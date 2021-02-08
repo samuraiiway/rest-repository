@@ -26,7 +26,7 @@ public interface MyRepository {
 ```
 - `@HttpRequest` is Method annotation to define uri and method of HTTP request
 - `@RequestBody` is Parameter annotation to define request body of HTTP request (Only support `application/json` for now)
-- `Response<List<TestResponse>>` is an example of return object which is parsing response body string by `objectMapper.readValue` (jackson) also support Java Generic Type
+- `Response<List<TestResponse>>` is an example of return object which is using `ParameterizedTypeReference` for message converter and also support Java Generic Type
 - `${name}` or `${status}` in uri is an example of path variable which is replacing by primitive data of method parameters (match by variable name)
 
 #### RestRepositoryAdvisor (Interface)
