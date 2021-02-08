@@ -84,9 +84,9 @@ public class MyRepositoryAdvisor implements RestRepositoryAdvisor {
     }
 }
 ```
-- This is a simple @Component bean
+- This is a simple `@Component` bean
 - So that can be made use of Spring IoC Container at full featured
-- Recommend to declare as @Component or @Service
+- Recommend to declare as `@Component` or `@Service`
 
 #### Configuration Bean
 ```java
@@ -134,5 +134,20 @@ public class MyController {
 }
 ```
 - This is a really simple example of using Repository as Rest API call
-- @Autowired Interface that already create proxy bean at Configuration @Bean
+- `@Autowired` Interface that already create proxy bean at Configuration @Bean
 - Call it as method signature defined on Interface
+
+#### Example of Raw Http Request
+- Assume that `application.properties` has `hostname=http://localhost:8080`
+- Assume `name` value is `samuraiiway`
+- Assume `status` value is `single`
+- Assume `testRequest` value is `{"message": "Hello World", "timestamp": 1612787138000}`
+- By calling this `myRepository.findByNameAndStatus(name, status, testRequest)` will make HTTP request as
+```text
+POST /test/name/samuraiiway/status/single HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 54
+
+{"message": "Hello World", "timestamp": 1612787138000}
+```
