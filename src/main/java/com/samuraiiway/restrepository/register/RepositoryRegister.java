@@ -53,6 +53,8 @@ public class RepositoryRegister {
             ResponseEntity responseEntity = restRepositoryAdvisor
                     .getRestTemplate()
                     .exchange(url, method, request, resolveTypeReference(invocation));
+
+            restRepositoryAdvisor.handlePostSuccess(responseEntity);
             return responseEntity.getBody();
 
         } catch (HttpStatusCodeException ex) {

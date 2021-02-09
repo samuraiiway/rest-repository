@@ -3,6 +3,7 @@ package com.samuraiiway.restrepository.advisor;
 import com.samuraiiway.restrepository.exception.RestRepositoryException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,6 +13,8 @@ public interface RestRepositoryAdvisor {
     String getHostName();
 
     RestTemplate getRestTemplate();
+
+    default void handlePostSuccess(ResponseEntity responseEntity) {}
 
     default void handleHttpException(HttpStatusCodeException ex) {
         ex.printStackTrace();
