@@ -38,6 +38,8 @@ public interface RestRepositoryAdvisor {
 
     RestTemplate getRestTemplate();
 
+    default void handlePostSuccess(ResponseEntity responseEntity) {}
+
     default void handleHttpException(HttpStatusCodeException ex) {
         ex.printStackTrace();
         throw new RestRepositoryException(ex.getStatusCode(), ex.getClass().getName(), new String(ex.getResponseBodyAsByteArray()));
@@ -53,6 +55,7 @@ public interface RestRepositoryAdvisor {
 - `HttpHeaders getHeader()` is to define custom http headers
 - `String getHotName()` is to define a hostname of HTTP request for a Repository
 - `RestTemplate getRestTemplate()` is to define custom bean of RestTemplate for HTTP request
+- `default void handlePostSuccess(ResponseEntity responseEntity)` is to define logic after HTTP request success
 - `default void handleDefaultException(Throwable ex)` is default http exception handler which is only call when `HttpStatusCodeException` was thrown
 - `default void handleDefaultException(Throwable ex)` is default exception handler for any Throwable
 
