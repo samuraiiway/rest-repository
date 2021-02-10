@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-public class RepositoryRegister {
+public class RepositoryRegister implements MethodInterceptor {
 
     private final RestRepositoryAdvisor restRepositoryAdvisor;
 
@@ -30,19 +30,25 @@ public class RepositoryRegister {
     public static <T> T createProxy(Class<T> type, RestRepositoryAdvisor restRepositoryAdvisor) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setInterfaces(type);
-        proxyFactory.addAdvice((MethodInterceptor) invocation -> {
-
-            if (invocation.getMethod().isAnnotationPresent(HttpRequest.class)) {
-                return execute(invocation, restRepositoryAdvisor);
-            }
-
-            return invocation.proceed();
-        });
+        proxyFactory.addAdvice(new RepositoryRegister(restRepositoryAdvisor));
 
         return type.cast(proxyFactory.getProxy());
     }
 
-    private static Object execute(MethodInvocation invocation, RestRepositoryAdvisor restRepositoryAdvisor) {
+    @Override
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+        if (invocation.getMethod().isAnnotationPresent(HttpRequest.class)) {
+            return execute(invocation, restRepositoryAdvisor);
+        }
+
+        if ("toString".equals(invocation.getMethod().getName())) {
+            return this.toString();
+        }
+
+        return invocation.proceed();
+    }
+
+    private Object execute(MethodInvocation invocation, RestRepositoryAdvisor restRepositoryAdvisor) {
         HttpMethod method = resolveMethod(invocation);
         String url = restRepositoryAdvisor.getHostName() + resolveUri(invocation);
         HttpHeaders headers = restRepositoryAdvisor.getHeader();
@@ -68,11 +74,11 @@ public class RepositoryRegister {
         return null;
     }
 
-    private static ParameterizedTypeReference resolveTypeReference(MethodInvocation invocation) {
+    private ParameterizedTypeReference resolveTypeReference(MethodInvocation invocation) {
         return ParameterizedTypeReference.forType(invocation.getMethod().getGenericReturnType());
     }
 
-    private static Object resolveBody(MethodInvocation invocation) {
+    private Object resolveBody(MethodInvocation invocation) {
         int idx = 0;
 
         for (Parameter parameter : invocation.getMethod().getParameters()) {
@@ -86,11 +92,11 @@ public class RepositoryRegister {
         return null;
     }
 
-    private static HttpMethod resolveMethod(MethodInvocation invocation) {
+    private HttpMethod resolveMethod(MethodInvocation invocation) {
         return HttpMethod.resolve(invocation.getMethod().getAnnotation(HttpRequest.class).method());
     }
 
-    private static String resolveUri(MethodInvocation invocation) {
+    private String resolveUri(MethodInvocation invocation) {
         String uri = invocation.getMethod().getAnnotation(HttpRequest.class).uri();
 
         Matcher matcher = pattern.matcher(uri);
