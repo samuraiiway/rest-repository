@@ -3,7 +3,9 @@ package com.samuraiiway.restrepository.util;
 public class StringUtil {
     private StringUtil() {}
 
-    public static String classNameToCamelCase(String className) {
-        return className.substring(0, 1).toLowerCase() + className.substring(1);
+    public static String getBeanName(String className) {
+        String[] names = className.split("\\.");
+        String name = names[names.length - 1];
+        return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
 }
