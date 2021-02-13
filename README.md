@@ -100,10 +100,32 @@ public RestTemplate restTemplate() {
 
 @Bean
 public MyRepository myRepository(MyRepositoryAdvisor myRepositoryAdvisor) {
-    return RepositoryRegister.createProxy(MyRepository.class, myRepositoryAdvisor);
+    return RestRepositoryFactory.createProxy(MyRepository.class, myRepositoryAdvisor);
 }
 ```
 - `RepositoryRegister.createProxy(Interface.class, RestRepositoryAdvisor advisor)` is to create proxy bean of Repository Interface with RestRepositoryAdvisor as advisor
+
+#### Auto Configuration (Alternative of Configuration Bean)
+```java
+@EnableRestRepository
+@SpringBootApplication
+public class SpringBootApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SpringBootApplication.class, args);
+	}
+}
+```
+- `@EnableRestRepository` is to scan @RestRepository annotation and create a proxy bean of that interface
+
+```java
+@RestRepository(advisor = MyRepositoryAdvisor.class)
+public interface MyRepository {
+	...
+}
+```
+- `@RestRepository` is to create a proxy bean of this annotated interface
+- `advisor = <T extends RestRepositoryAdvisor>` is to specific `RestRepositoryAdvisor` corresponding to this annotated interface
 
 #### Example of Repository Usages
 ```java
