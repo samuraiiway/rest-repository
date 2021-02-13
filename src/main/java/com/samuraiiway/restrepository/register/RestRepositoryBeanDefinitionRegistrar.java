@@ -38,7 +38,7 @@ public class RestRepositoryBeanDefinitionRegistrar implements ImportBeanDefiniti
             Class advisorClass = ((RestRepository) beanClass.getDeclaredAnnotation(RestRepository.class)).advisor();
 
             BeanDefinitionBuilder beanBuilder = BeanDefinitionBuilder
-                    .rootBeanDefinition(RepositoryRegister.class)
+                    .rootBeanDefinition(RestRepositoryFactory.class)
                     .setFactoryMethod("createProxy")
                     .addConstructorArgValue(beanClass)
                     .addConstructorArgReference(StringUtil.getBeanName(advisorClass.getName()));
